@@ -1,0 +1,177 @@
+@startuml
+title Diagrama de Sequencia UC 03 - Gerenciar Insumos
+actor User as "Admin"
+Boundary ListPage as "Página de Insumos"
+Boundary CreatePage as "Página de novo Insumo"
+Boundary EditPage as "Página de edição de Insumo"
+Boundary ListCustosPage as "Página de custos de insumo"
+Boundary CreateCustoInsumo as "Página de novo custo de Insumo"
+Boundary EditCustoPage as "Página de edição de custo de Insumo"
+Control InsumosController
+participant InsumosService
+Entity Insumos
+Entity InsumosCustos
+
+activate User
+User -> ListPage: acessa
+activate ListPage
+ListPage -> InsumosController: getAll()
+activate InsumosController
+InsumosController -> InsumosService: getAll()
+activate InsumosService
+InsumosService -> Insumos:all()
+activate Insumos
+Insumos --> InsumosService: array<insumos>
+destroy Insumos
+InsumosService --> InsumosController: array<insumos>
+destroy InsumosService
+InsumosController --> ListPage: array<insumos>
+destroy InsumosController
+ListPage --> User: lista de insumos
+
+opt
+    User -> ListPage: adiciona um insumo
+    ListPage -> InsumosController: create()
+    activate InsumosController
+    InsumosController -> CreatePage: view de novo Insumo
+    destroy InsumosController
+    activate CreatePage
+    destroy ListPage
+    CreatePage -> InsumosController: store(Insumo)
+    activate InsumosController
+    InsumosController -> InsumosService: store(Insumo)
+    activate InsumosService
+    InsumosService -> Insumos:create(Insumo)
+    activate Insumos
+    Insumos --> InsumosService: Insumo
+    destroy Insumos
+    InsumosService --> InsumosController: Insumo
+    destroy InsumosService
+    InsumosController --> ListPage: array<insumos>
+    destroy InsumosController
+    destroy CreatePage
+    activate ListPage
+    ListPage --> User: lista de insumos
+end
+opt
+    User -> ListPage: edita um insumo
+    ListPage -> InsumosController: edit(Insumo)
+    activate InsumosController
+    InsumosController -> EditPage: view de edição de Insumo
+    destroy InsumosController
+    activate EditPage
+    destroy ListPage
+    EditPage -> InsumosController: update(Insumo)
+    activate InsumosController
+    InsumosController -> InsumosService: update(Insumo)
+    activate InsumosService
+    InsumosService -> Insumos:update()
+    activate Insumos
+    Insumos --> InsumosService: Insumo
+    destroy Insumos
+    InsumosService --> InsumosController: array<insumos>
+    destroy InsumosService
+    InsumosController --> ListPage: array<insumos>
+    destroy InsumosController
+    destroy EditPage
+    activate ListPage
+    ListPage --> User: lista de insumos
+end
+opt
+    User -> ListPage: exclui um insumo
+    ListPage -> InsumosController: delete(Insumo)
+    activate InsumosController
+    InsumosController -> InsumosService: delete(Insumo)
+    activate InsumosService
+    InsumosService -> Insumos:delete()
+    activate Insumos
+    destroy Insumos
+    InsumosService --> InsumosController: array<insumos>
+    destroy InsumosService
+    InsumosController --> ListPage: array<insumos>
+    destroy InsumosController
+    ListPage --> User: lista de insumos
+end
+
+opt
+    User -> ListCustosPage: acessa custos do insumo
+    activate ListCustosPage
+    ListCustosPage -> InsumosController: getAllCustos(Insumo)
+    activate InsumosController
+    InsumosController -> InsumosService: getAllCustos(Insumo)
+    activate InsumosService
+    InsumosService -> Insumos:custos()
+    activate Insumos
+    Insumos --> InsumosService: array<insumosCustos>
+    destroy Insumos
+    InsumosService --> InsumosController: array<insumosCustos>
+    destroy InsumosService
+    InsumosController --> ListCustosPage: array<insumosCustos>
+    destroy InsumosController
+    ListCustosPage --> User: lista de custos do insumo
+
+    opt
+        User -> ListCustosPage: adiciona um custo de insumo
+        ListCustosPage -> InsumosController: createCusto()
+        activate InsumosController
+        InsumosController -> CreateCustoInsumo: view de novo custo do Insumo
+        destroy InsumosController
+        activate CreateCustoInsumo
+        destroy ListCustosPage
+        CreateCustoInsumo -> InsumosController: store(InsumoCusto)
+        activate InsumosController
+        InsumosController -> InsumosService: store(InsumoCusto)
+        activate InsumosService
+        InsumosService -> InsumosCustos:create(InsumoCusto)
+        activate InsumosCustos
+        InsumosCustos --> InsumosService: InsumoCusto
+        destroy InsumosCustos
+        InsumosService --> InsumosController: array<insumosCustos>
+        destroy InsumosService
+        InsumosController --> ListCustosPage: array<insumosCustos>
+        destroy InsumosController
+        destroy CreateCustoInsumo
+        activate ListCustosPage
+        ListCustosPage --> User: lista de custos do insumos
+    end
+    opt
+        User -> ListCustosPage: edita um custo de insumo
+        ListCustosPage -> InsumosController: editCusto(InsumoCusto)
+        activate InsumosController
+        InsumosController -> EditCustoPage: view de edição de custo do Insumo
+        destroy InsumosController
+        activate EditCustoPage
+        destroy ListCustosPage
+        EditCustoPage -> InsumosController: update(InsumoCusto)
+        activate InsumosController
+        InsumosController -> InsumosService: update(InsumoCusto)
+        activate InsumosService
+        InsumosService -> InsumosCustos:update()
+        activate InsumosCustos
+        InsumosCustos --> InsumosService: InsumoCusto
+        destroy InsumosCustos
+        InsumosService --> InsumosController: array<insumosCustos>
+        destroy InsumosService
+        InsumosController --> ListCustosPage: array<insumosCustos>
+        destroy InsumosController
+        destroy EditCustoPage
+        activate ListCustosPage
+        ListCustosPage --> User: lista de custos do insumos
+    end
+    opt
+        User -> ListCustosPage: exclui um custo de insumo
+        ListCustosPage -> InsumosController: deleteCusto(InsumoCusto)
+        activate InsumosController
+        InsumosController -> InsumosService: deleteCusto(InsumoCusto)
+        activate InsumosService
+        InsumosService -> InsumosCustos:delete()
+        activate InsumosCustos
+        destroy InsumosCustos
+        InsumosService --> InsumosController: array<insumosCustos>
+        destroy InsumosService
+        InsumosController --> ListCustosPage: array<insumosCustos>
+        destroy InsumosController
+        ListCustosPage --> User: lista de custos do insumos
+    end
+end
+@enduml

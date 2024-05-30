@@ -1,0 +1,91 @@
+@startuml
+title Diagrama de Sequencia UC 06 - Gerenciar Receitas
+actor User as "Admin"
+Boundary ListPage as "Página de receitas"
+Boundary CreatePage as "Página de nova receita"
+Boundary EditPage as "Página de edição de receita"
+Control ReceitasController
+participant ReceitasService
+Entity Receitas
+
+activate User
+User -> ListPage: acessa
+activate ListPage
+ListPage -> ReceitasController: getAll()
+activate ReceitasController
+ReceitasController -> ReceitasService: getAll()
+activate ReceitasService
+ReceitasService -> Receitas:all()
+activate Receitas
+Receitas --> ReceitasService: array<receitas>
+destroy Receitas
+ReceitasService --> ReceitasController: array<receitas>
+destroy ReceitasService
+ReceitasController --> ListPage: array<receitas>
+destroy ReceitasController
+ListPage --> User: lista de receitas
+
+opt
+    User -> ListPage: adiciona uma receita
+    ListPage -> ReceitasController: create()
+    activate ReceitasController
+    ReceitasController -> CreatePage: view de nova receita
+    destroy ReceitasController
+    activate CreatePage
+    destroy ListPage
+    CreatePage -> ReceitasController: store(Receita)
+    activate ReceitasController
+    ReceitasController -> ReceitasService: store(Receita)
+    activate ReceitasService
+    ReceitasService -> Receitas:create(Receita)
+    activate Receitas
+    Receitas --> ReceitasService: Receita
+    destroy Receitas
+    ReceitasService --> ReceitasController: Receita
+    destroy ReceitasService
+    ReceitasController --> ListPage: array<receitas>
+    destroy ReceitasController
+    destroy CreatePage
+    activate ListPage
+    ListPage --> User: lista de receitas
+end
+opt
+    User -> ListPage: edita uma receita
+    ListPage -> ReceitasController: edit(Receita)
+    activate ReceitasController
+    ReceitasController -> EditPage: view de edição de receita
+    destroy ReceitasController
+    activate EditPage
+    destroy ListPage
+    EditPage -> ReceitasController: update(Receita)
+    activate ReceitasController
+    ReceitasController -> ReceitasService: update(Receita)
+    activate ReceitasService
+    ReceitasService -> Receitas:update()
+    activate Receitas
+    Receitas --> ReceitasService: Receita
+    destroy Receitas
+    ReceitasService --> ReceitasController: Receita
+    destroy ReceitasService
+    ReceitasController --> ListPage: array<receitas>
+    destroy ReceitasController
+    destroy EditPage
+    activate ListPage
+    ListPage --> User: lista de receitas
+end
+opt
+    User -> ListPage: exclui uma receita
+    ListPage -> ReceitasController: delete(Receita)
+    activate ReceitasController
+    ReceitasController -> ReceitasService: delete(Receita)
+    activate ReceitasService
+    ReceitasService -> Receitas:delete()
+    activate Receitas
+    destroy Receitas
+    ReceitasService --> ReceitasController: array<receitas>
+    destroy ReceitasService
+    ReceitasController --> ListPage: array<receitas>
+    destroy ReceitasController
+    ListPage --> User: lista de receitas
+end
+@enduml
