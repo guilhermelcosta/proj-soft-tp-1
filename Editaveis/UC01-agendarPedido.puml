@@ -1,0 +1,133 @@
+@startuml
+title Diagrama de Sequencia UC 01 - Agendar Pedidos
+actor User as "Cliente"
+Boundary ProdutosPage as "Página de produtos"
+Boundary CheckoutPage as "Página de carrinho"
+Control ProdutosController
+Control PedidosController
+participant ProdutosService
+participant PedidosService
+participant ClientesService
+participant EnderecosService
+Entity Produtos
+Entity PedidosItens
+Entity Pedidos
+Entity Clientes
+Entity Enderecos
+Boundary Whatsapp as "API Whatsapp"
+
+activate User
+User -> ProdutosPage: acessa o
+activate ProdutosPage
+ProdutosPage -> ProdutosController: getAll()
+activate ProdutosController
+ProdutosController -> ProdutosService: getAll()
+activate ProdutosService
+ProdutosService -> Produtos:all()
+activate Produtos
+Produtos --> ProdutosService: array<produtos>
+destroy Produtos
+ProdutosService --> ProdutosController: array<produtos>
+destroy ProdutosService
+ProdutosController --> ProdutosPage: array<produtos>
+destroy ProdutosController
+ProdutosPage --> User: lista de produtos
+
+opt
+    User -> ProdutosPage: adiciona produto ao carrinho
+    ProdutosPage -> PedidosController: addItem(Produto)
+    activate PedidosController
+    PedidosController -> PedidosService: addItem(Produto)
+    activate PedidosService
+    PedidosService -> PedidosItens:create(Pedido, Produto, qtd, valor)
+    activate PedidosItens
+    PedidosItens --> PedidosService: PedidosItens
+    destroy PedidosItens
+    PedidosService --> PedidosController: Pedido
+    destroy PedidosService
+    PedidosController --> ProdutosPage: Pedido
+    destroy PedidosController
+    ProdutosPage --> User: Pedido
+end
+opt
+    User -> ProdutosPage: exclui produto do carrinho
+    ProdutosPage -> PedidosController: excludeProduto(Produto)
+    activate PedidosController
+    PedidosController -> PedidosService: excludeProduto(Produto)
+    activate PedidosService
+    PedidosService -> PedidosItens: delete(PedidoItem)
+    activate PedidosItens
+    destroy PedidosItens
+    PedidosService --> PedidosController: Pedido
+    destroy PedidosService
+    PedidosController --> ProdutosPage: Pedido
+    destroy PedidosController
+    ProdutosPage --> User: Pedido
+    destroy ProdutosPage
+end
+
+User -> CheckoutPage: acessa
+activate CheckoutPage
+CheckoutPage -> PedidosController: getPedido(Pedido)
+activate PedidosController
+PedidosController -> PedidosService: getPedido(Pedido)
+activate PedidosService
+PedidosService -> Pedidos:where(id, "=", pedidoId)
+activate Pedidos
+Pedidos --> PedidosService: Pedido
+destroy Pedidos
+PedidosService --> PedidosController: Pedido
+destroy PedidosService
+PedidosController --> CheckoutPage: Pedido
+destroy PedidosController
+CheckoutPage --> User: Pedido
+
+User -> CheckoutPage: adiciona informações do cliente
+CheckoutPage -> PedidosController: addCliente(Pedido, Cliente)
+activate PedidosController
+PedidosController -> PedidosService: addCliente(Pedido, Cliente)
+activate PedidosService
+PedidosService -> ClientesService: getOrCreate(Cliente)
+activate ClientesService
+ClientesService -> Clientes: getOrcreate(Cliente)
+activate Clientes
+Clientes --> ClientesService: Cliente
+destroy Clientes
+ClientesService -> PedidosService: Cliente
+destroy ClientesService
+PedidosService --> Pedidos: update()
+activate Pedidos
+destroy Pedidos
+PedidosService --> PedidosController: Pedido
+destroy PedidosService
+PedidosController --> CheckoutPage: Pedido
+destroy PedidosController
+CheckoutPage --> User: Pedido
+
+User -> CheckoutPage: adiciona informações de entrega
+CheckoutPage -> PedidosController: addEndereco(Pedido, Endereco)
+activate PedidosController
+PedidosController -> PedidosService: addEndereco(Pedido, Endereco)
+activate PedidosService
+PedidosService -> EnderecosService: getOrCreate(Endereco)
+activate EnderecosService
+EnderecosService -> Enderecos: getOrcreate(Endereco)
+activate Enderecos
+Enderecos --> EnderecosService: Endereco
+destroy Enderecos
+EnderecosService --> PedidosService: Endereco
+destroy EnderecosService
+PedidosService --> Pedidos: update()
+activate Pedidos
+destroy Pedidos
+PedidosService --> PedidosController: Pedido
+destroy PedidosService
+PedidosController --> CheckoutPage: Pedido
+destroy PedidosController
+CheckoutPage --> User: Pedido
+
+User -> CheckoutPage: confirma pedido
+CheckoutPage -> Whatsapp: https://api.whatsapp.com/send?phone=numeroTelefone
+activate Whatsapp
+CheckoutPage --> User: pedido concluído
+@enduml
