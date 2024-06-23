@@ -1,0 +1,25 @@
+@startuml
+actor Admin
+
+Admin -> ReceitasService : store(dados)
+ReceitasService -> ObservacoesService : store(dados)
+ObservacoesService --> ReceitasService : observacao
+ReceitasService -> IngredientesService : store(ingrediente, receita)
+ReceitasService --> Admin : receita
+
+Admin -> ReceitasService : update(dados, receita)
+ReceitasService -> ObservacoesService : update(dados, receita)
+ObservacoesService --> ReceitasService : dados
+ReceitasService -> IngredientesService : update(dados, receita)
+IngredientesService --> ReceitasService : dados
+ReceitasService --> Admin : void
+
+Admin -> ReceitasService : destroy(receita)
+ReceitasService -> Receita : delete()
+ReceitasService --> Admin : void
+
+Admin -> ReceitasService : bulkDestroy(receitas)
+ReceitasService -> Receita : where(id)
+Receita -> Receita : delete()
+ReceitasService --> Admin : void
+@enduml
